@@ -1,0 +1,7 @@
+<wallpaper 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	android:description="@string/hglw_desc" 
+	android:author="@string/hglw_author" 
+	android:thumbnail="@drawable/thumbnail"
+	android:settingsActivity="com.KDJStudios.Settings"
+/>

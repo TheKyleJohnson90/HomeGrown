@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<string-array name="tracerStyleNames">
+   <item>None</item>
+   <item>Fades</item>
+   <item>Explodes</item>
+</string-array>
+<string-array name="tracerStyles">
+   <item>0</item>
+   <item>1</item>
+   <item>2</item>
+</string-array>
+
+<string-array name="physicStyleNames">
+   <item>Bounce</item>
+   <item>(NOTWORKING)Falling</item>
+   <item>None (With Border)</item>
+   <item>(NOTWORKING)None</item>
+</string-array>
+<string-array name="physicStyles">
+   <item>0</item>
+   <item>1</item>
+   <item>2</item>
+   <item>3</item>
+</string-array>
+
+<string-array name="rotationStyleNames">
+   <item>None</item>
+   <item>X-Axis (Rotation)</item>
+   <item>(NOTWORKING)Y-Axis (Flip)</item>
+   <item>(HALFWORKING)Both</item>
+</string-array>
+<string-array name="rotationStyles">
+   <item>0</item>
+   <item>1</item>
+   <item>2</item>
+   <item>3</item>
+</string-array>
+
+<string-array name="defaultStyleNames">
+   <item>BG</item>
+   <item>Y-Axis</item>
+   <item>Both</item>
+   <item>None</item>
+</string-array>
+
+<string-array name="defaultStyles">
+   <item>0</item>
+   <item>1</item>
+   <item>2</item>
+   <item>3</item>
+</string-array>
+<string-array name="defaultSpriteNames">
+   <item>BG</item>
+
+</string-array>
+<string-array name="defaultBgNames">
+   <item>one</item>
+   
+</string-array>
+<string-array name="defaultBgImages">
+	<item>@drawable/bg14</item>
+
+
+</string-array>
+<array name="defaultSpriteImages">
+	<item>@drawable/s04</item>
+
+</array>
+</resources>

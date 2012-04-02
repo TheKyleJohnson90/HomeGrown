@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:title="@string/hglw_settings">
+    	<PreferenceCategory android:title="Background Image">
+                <CheckBoxPreference
+                        android:title="Use Background Image"
+                        android:summary="Show or hide the background image."
+                        android:key="showBgImagePref" 
+                        android:defaultValue="true"
+                />
+                <ListPreference
+                    android:enabled="false"
+                   		android:dependency="showBgImagePref"
+                        android:title="Choose Background"
+                        android:summary="Choose from available images."                        
+                        android:key="stockBgImagePref"
+                        android:entries="@array/defaultBgNames"
+                        android:entryValues="@array/defaultBgImages"
+                        android:defaultValue="bg01"
+                />
+                <Preference
+                   		android:dependency="showBgImagePref"
+                        android:title="Background Image"
+                		android:summary="Choose your own background image."
+                        android:key="bgImagePref" 
+                />
+                <com.KDJStudios.ColorPreference
+                        android:title="Background Color"
+                        android:dialogTitle="Background Underlaying Color" 
+                		android:summary="Used only without Background Image."
+                        android:key="bgColorPref" 
+                        android:defaultValue="0x000037"
+                />      
+        </PreferenceCategory>
+        <PreferenceCategory android:title="Sprites">
+                <CheckBoxPreference
+                        android:title="Show Sprites"
+                        android:summary="Show or hide the sprites."
+                        android:key="showSpritesPref" 
+                        android:defaultValue="false"
+                />
+                <ListPreference
+                    	android:enabled="false"
+                   		android:dependency="showSpritesPref"
+                        android:title="Choose Sprite"
+                        android:summary="Choose from available sprite."                        
+                        android:key="stockSpritePref"
+                        android:entries="@array/defaultSpriteNames"
+                        android:entryValues="@array/defaultSpriteImages"
+                        android:defaultValue="s01"
+                />
+                
+                <Preference
+                   		android:dependency="showSpritesPref"
+                        android:title="Sprite Image"
+                		android:summary="Choose your own image."
+                        android:key="spriteImagePref" 
+                />
+                <com.KDJStudios.ColorPreference
+                        android:title="Sprite Overlay"
+                        android:dialogTitle="Sprite color" 
+                		android:summary="Change the sprites color."
+                        android:key="spriteColorPref" 
+                        android:defaultValue="0xc8c800"
+                /> 
+                <CheckBoxPreference
+                    	android:dependency="showSpritesPref"
+                        android:title="Enable/Disable Collisions"
+                        android:summary="Do the sprites bounce of each other."
+                        android:key="collisionPref" 
+                        android:defaultValue="true"
+                />
+                <ListPreference
+                		android:dependency="collisionPref"
+                        android:title="Tracer style"
+                        android:summary="Choose the tracer style."                        
+                        android:key="tracerStylePref"
+                        android:defaultValue="0"
+                        android:entries="@array/tracerStyleNames"
+                        android:entryValues="@array/tracerStyles"
+                />
+                <com.KDJStudios.ColorPreference
+                    	android:dependency="collisionPref"
+                        android:title="Tracer Overlay"
+                        android:dialogTitle="Tracer color" 
+                		android:summary="Change the tracers color."
+                        android:key="tracerColorPref" 
+                        android:defaultValue="0x7700aa"
+                /> 
+                <ListPreference
+                		android:dependency="showSpritesPref"
+                        android:title="Rotation style"
+                        android:summary="Choose the rotation style."                        
+                        android:key="rotationStylePref"
+                        android:defaultValue="0"
+                        android:entries="@array/rotationStyleNames"
+                        android:entryValues="@array/rotationStyles"
+                />
+                <ListPreference
+                		android:dependency="showSpritesPref"
+                        android:title="Physics style"
+                        android:summary="Choose the physics style."                        
+                        android:key="physicStylePref"
+                        android:defaultValue="0"
+                        android:entries="@array/physicStyleNames"
+                        android:entryValues="@array/physicStyles"
+                />
+        </PreferenceCategory>
+</PreferenceScreen>

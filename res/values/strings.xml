@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Home Grown Live Wallpaper</string>
+	<string name="app_sdk">7</string>
+	<string name="hglw_name">Home Grown</string>
+	<string name="hglw_desc">This live wall paper features bouncing sprites with user configurations</string>
+	<string name="hglw_settings">Home Grown Settings</string>
+	<string name="hglw_author">Kyle Johnson</string>
+	<string name="hglw_website">KJsourcecode.com</string>
+</resources>

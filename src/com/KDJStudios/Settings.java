@@ -23,12 +23,14 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
 	public static final String	SPRITE_LIST_KEY = "stockSpriteImagePref";
 	//choice lists
 	public static final String	TRACER_LIST_KEY = "tracerStylePref";
-	public static final String	PHYSIC_LIST_KEY = "physicStylePref";
+	//public static final String	PHYSIC_LIST_KEY = "physicStylePref";
+
+
 	private static final int	CHOOSE_IMAGE_REQUEST = 1;
 	private static final int	CHOOSE_SPRITE_IMAGE_REQUEST = 2;
 	//private static final int	CHOOSE_TRACER_REQUEST = 3;
 	//private static final int	CHOOSE_SOUND_REQUEST = 2;
-	
+	//public static final String	RESET_KEY = "resetPref";
 	private ListPreference		bgList = null;
 	private ListPreference		spriteList = null;
 
@@ -40,12 +42,13 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
 		getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 		
 		findPreference(BG_IMAGE_KEY).setOnPreferenceClickListener(this);
-		bgList = (ListPreference) findPreference(BG_LIST_KEY);
-		updateList(BG_IMAGE_KEY);
+		//bgList = (ListPreference) findPreference(BG_LIST_KEY);
+		//updateList(BG_IMAGE_KEY);
 		
 		findPreference(SPRITE_IMAGE_KEY).setOnPreferenceClickListener(this);
 		//spriteList = (ListPreference) findPreference(SPRITE_LIST_KEY);
 		//updateList(SPRITE_IMAGE_KEY);
+		//findPreference(RESET_KEY).setOnPreferenceChangeListener(this);
 		return;
 	}
 
@@ -67,6 +70,7 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
 	}
 
 
+	@SuppressWarnings("unused")
 	private void updateList(String key) {
 		//String 
 		String vUser = findPreference(key).getSharedPreferences().getString(key, null);

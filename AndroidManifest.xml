@@ -23,7 +23,7 @@
         <activity
             android:label="@string/hglw_settings"
             android:name=".Settings"
-            android:theme="@android:style/Theme.Light.WallpaperSettings"
+            android:theme="@android:style/Theme.Black"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

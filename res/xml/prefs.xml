@@ -8,19 +8,9 @@
                         android:key="showBgImagePref" 
                         android:defaultValue="true"
                 />
-                <ListPreference
-                    android:enabled="false"
-                   		android:dependency="showBgImagePref"
-                        android:title="Choose Background"
-                        android:summary="Choose from available images."                        
-                        android:key="stockBgImagePref"
-                        android:entries="@array/defaultBgNames"
-                        android:entryValues="@array/defaultBgImages"
-                        android:defaultValue="bg01"
-                />
                 <Preference
                    		android:dependency="showBgImagePref"
-                        android:title="Background Image"
+                        android:title="Load Image"
                 		android:summary="Choose your own background image."
                         android:key="bgImagePref" 
                 />
@@ -39,20 +29,9 @@
                         android:key="showSpritesPref" 
                         android:defaultValue="false"
                 />
-                <ListPreference
-                    	android:enabled="false"
-                   		android:dependency="showSpritesPref"
-                        android:title="Choose Sprite"
-                        android:summary="Choose from available sprite."                        
-                        android:key="stockSpritePref"
-                        android:entries="@array/defaultSpriteNames"
-                        android:entryValues="@array/defaultSpriteImages"
-                        android:defaultValue="s01"
-                />
-                
                 <Preference
                    		android:dependency="showSpritesPref"
-                        android:title="Sprite Image"
+                        android:title="Load Sprite Image"
                 		android:summary="Choose your own image."
                         android:key="spriteImagePref" 
                 />
@@ -96,14 +75,9 @@
                         android:entries="@array/rotationStyleNames"
                         android:entryValues="@array/rotationStyles"
                 />
-                <ListPreference
-                		android:dependency="showSpritesPref"
-                        android:title="Physics style"
-                        android:summary="Choose the physics style."                        
-                        android:key="physicStylePref"
-                        android:defaultValue="0"
-                        android:entries="@array/physicStyleNames"
-                        android:entryValues="@array/physicStyles"
-                />
         </PreferenceCategory>
+        <CheckBoxPreference 
+            android:title="Reset to defaults(Cannot be undone) " 
+            android:summary="Returns application to original settings" 
+            android:key="resetPref"/>
 </PreferenceScreen>

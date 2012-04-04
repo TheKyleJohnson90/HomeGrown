@@ -1,13 +1,24 @@
 Install Instructions:
 1. Copy HomeGrown.apk file to your SD Card
-2. Use any file app to navigate to the file and activate it to install
+2. Use any file app to navigate to the file and activate it to install( if you have trouble with this see below steps 1-3)
 3. Go to your "Home Screen" and hit "Menu >> Live Wallpaper"
 4. Scroll to "Home Grown" and click on settings to adjust display 
 5. Select "Set As Wallpaper"
 
-[DEVICES TESTED ON]/[0-10 WORKING SCALE]
+If you are having trouble installing please follow these easy steps:
+1) Go to Settings > Applications
+2) Check the box next to Unknown sources
+3) Confirm
 
-10 - HTC Evo3D / Works perfectly.
+[0-10]	- [DEVICES(ANDROID VERSION) TESTED]  		/ [COMMENTS]
+
+[10]	- HTC Evo3D(2.3.4) 				/ All functions marked are working perfectly.
+[7]	- SAMSUNG Vibrant S(2.3.4) 			/ All functions marked are working perfectly.
+[9]	- HTC Incredible 2(2.3.4) 			/ All functions marked are working perfectly.
+
+
+[10]	- ITS Yours(4.0.3) 				/ What Will It Do To Your Device!
+
 
 [WARNING!]
 Doesn't seem to be working with android devices under 2.1

@@ -24,6 +24,7 @@ public class Wallpaper extends WallpaperService {
 
     private final Handler 			mHandler = new Handler();
 	public static final String 		SHARED_PREFS="hglwsettings";
+	public static final String 		VOID="DEFAULT";
     public static final int 		BG_COLOR = 0x000037;
 	public static final int 		FG_COLOR = 0xffffffff;
     @Override
@@ -43,18 +44,19 @@ public class Wallpaper extends WallpaperService {
 
     class SpriteEngine extends Engine implements SharedPreferences.OnSharedPreferenceChangeListener {
     	private final ArrayList<Sprite>		mSprites = new ArrayList<Sprite>();
+    	private int 						mSpriteSize=0;
     	//frames
 	    private static final int 		SPRITE_LIFETIME = 400;
 		// the minimum number of circles we keep on the screen
 		private static final int 		MIN_SPRITE = 3;
 		// after this many we start killing them off whenever
 		//  we create a new one
-		private static final int 		MAX_SPRITE = 13;
+		private static final int 		MAX_SPRITE = 15;
 		// radius limits
 		private static final int 		MIN_RADIUS = 40;
 		private static final int 		MAX_RADIUS = 100;	
 		// time between frames (mili-sec)
-		private static final int		FRAME_INTERVAL = 50;
+		private static final int		FRAME_INTERVAL = 20;
 		//Colors
         private final Paint 			mPaint = new Paint();
         private int						mBgColor = BG_COLOR;
@@ -76,16 +78,16 @@ public class Wallpaper extends WallpaperService {
         //
     	//Sprite Image
     	private Bitmap					mSpriteBitmap =null;
-        //private boolean					mUseSound = true;
         private boolean					mShowSprites = false;
-        private String					mSpriteImageString = null;
+        private String					mSpriteImageString;
         private boolean					mCollisions = true;
     	private int						mTracerStyle = 0;    	
-    	private int						mPhysicStyle = 0;
+    	@SuppressWarnings("unused")
+		private int						mPhysicStyle = 0;
     	private int						mRotationStyle = 0;
       //BG Image
     	private Bitmap					mBitmap = null;
-    	private String					mBgImageString = null;
+    	private String					mBgImageString;
     	private boolean					mShowBgImage = false;
     	//private ColorFilter 			filter;
         private final Runnable mNextFrame = new Runnable() {
@@ -97,10 +99,9 @@ public class Wallpaper extends WallpaperService {
 
         SpriteEngine(WallpaperService ws) {
             //Temporary testing
-            mSpriteBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.s04);
-            mBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.bg14);
-            //loadSpriteBitmap();
-            //loadBgBitmap();
+            mBgImageString=VOID;
+            mSpriteImageString=VOID;
+            
             mPrefs = Wallpaper.this.getSharedPreferences(SHARED_PREFS, 0);
     		mPrefs.registerOnSharedPreferenceChangeListener(this);
     		onSharedPreferenceChanged(mPrefs, null);
@@ -137,12 +138,16 @@ public class Wallpaper extends WallpaperService {
             super.onSurfaceChanged(holder, format, width, height);
             drawFrame();
             //
-            mWidth = width;
-    		mHeight = height;
-    		//
-    		int size =mSprites.size();
-    		if(size < MIN_SPRITE){
-    			for(int x=size;x<MIN_SPRITE;x++){
+            if((mWidth != width)||(mHeight != height)){
+            	mWidth = width;
+            	mHeight = height;
+            	loadSpriteBitmap();
+                loadBgBitmap();
+            }
+
+    		mSpriteSize=mSprites.size();
+    		if(mSpriteSize < MIN_SPRITE){
+    			for(int x=mSpriteSize;x<MIN_SPRITE;x++){
     				mSprites.add(generateSprite(mWidth/2, mHeight/2, mWidth/2, mHeight/2));
     			}
     		}
@@ -158,6 +163,9 @@ public class Wallpaper extends WallpaperService {
         @Override
         public void onSurfaceDestroyed(SurfaceHolder holder) {
             super.onSurfaceDestroyed(holder);
+            //delete sprites
+            mSprites.clear();
+            mSpriteSize=0;
             mVisible = false;
             mHandler.removeCallbacks(mNextFrame);
         }
@@ -165,7 +173,6 @@ public class Wallpaper extends WallpaperService {
         @Override
         public void onOffsetsChanged(float xOffset, float yOffset,
                 float xStep, float yStep, int xPixels, int yPixels) {
-            //mOffset = xOffset;
             mXOff = xOffset;
     		mYOff = yOffset;
     		if(mBitmap != null){
@@ -176,7 +183,8 @@ public class Wallpaper extends WallpaperService {
         }
 
         /*
-         * Store the position of the touch event so we can use it for drawing later
+         * Store the position of the touch event
+         * Spawn a new sprite if alloted memory in "mSprites" is less then "MAX_SPRITE"
          */
         @Override
         public void onTouchEvent(MotionEvent event) {
@@ -187,6 +195,7 @@ public class Wallpaper extends WallpaperService {
         		if(mSprites.size()<MAX_SPRITE){
     	        	Sprite b = generateSprite( event.getX(), event.getY(),mTouchX, mTouchY);//
     				mSprites.add(b);
+    				mSpriteSize++;
             	}
         		mTouchX = -1;
                 mTouchY = -1;
@@ -198,6 +207,9 @@ public class Wallpaper extends WallpaperService {
         	
             super.onTouchEvent(event);
         }
+        /*
+         * Generate the sprite and its velocity
+         */
         Sprite generateSprite(float x1, float y1, float x2, float y2){
     		Random rn = new Random();
     		int r = (int) (MAX_RADIUS * rn.nextDouble());
@@ -232,9 +244,9 @@ public class Wallpaper extends WallpaperService {
     	}
 
         /*
-         * Draw one frame of the animation. This method gets called repeatedly
-         * by posting a delayed Runnable. You can do any drawing you want in
-         * here. This example draws a wireframe cube.
+         * Draw one frame of the wallpaper. 
+         * Check for bad memory
+         * Schedule the next frame
          */
         void drawFrame() {
             final SurfaceHolder holder = getSurfaceHolder();
@@ -244,7 +256,11 @@ public class Wallpaper extends WallpaperService {
             try {
                 c = holder.lockCanvas();
                 if (c != null) {
-                	//BG->Tracers->Sprites->TouchPoint
+                	/*
+                     * Order to draw the Screen
+                     * BG->Tracers->Sprites->TouchPoint
+                     */
+                	
                     drawBG(c);
                     drawTracers(c);
        				drawSprites(c);
@@ -253,7 +269,7 @@ public class Wallpaper extends WallpaperService {
             } finally {
                 if (c != null) holder.unlockCanvasAndPost(c);
             }
-    		//
+    		// check for bad memory no matter if the canvas was used
             checkSprites();
     		// schedule the next frame
             mHandler.removeCallbacks(mNextFrame);
@@ -261,6 +277,9 @@ public class Wallpaper extends WallpaperService {
                 mHandler.postDelayed(mNextFrame, FRAME_INTERVAL);
             }
         }
+        /*
+         * Draws tracer effects at 
+         */
 		void drawTracers(Canvas c){
 			//check for collisions
 			if(mShowSprites){
@@ -271,10 +290,13 @@ public class Wallpaper extends WallpaperService {
 	    		}
 			}
 		}
-        //
+		/*
+         * Draws a the sprites loaded into "mSprites"
+         * Also handles physics, rotations, and collisions here
+         */
         void drawSprites(Canvas c){
 
-    		if(mShowSprites){
+    		if((mShowSprites)){
     			for(Sprite b : mSprites){
     				//check for collisions
     				b.collide((int)mWidth,(int) mHeight);
@@ -290,21 +312,27 @@ public class Wallpaper extends WallpaperService {
     	    		}
         			//Perform updates
     				b.update();
-    				if((mRotationStyle!=0)&&(mRotationStyle!=2)){
+    				if((mRotationStyle==1)||(mRotationStyle==3)){//Rotate? both
 						b.updateRotation();
+					}else if((mRotationStyle==2)||(mRotationStyle==3)){//Flip? both
+						//b.updateFlip();
 					}
     				//Draw
 					b.draw(c, mPaint);
     			}
-			}	
+			}else{
+				c.drawCircle((int)mTouchX, (int)mTouchY, (int)80, mPaint);
+			}
         }
-        //
+        /*
+         * Double check for dead sprites, can't waste that battery
+         */
         void checkSprites(){
-        	int nSprites = mSprites.size();
+        	mSpriteSize = mSprites.size();
     		Sprite oldestSprite = null;
     		int oldestAge = 0;
     		int thisAge = 0;
-    		if(nSprites > MIN_SPRITE){
+    		if(mSpriteSize > MIN_SPRITE){
     			List<Sprite> toDeleteList = new ArrayList<Sprite>();
     			for(Sprite b : mSprites){
     				thisAge = b.getAge();
@@ -319,24 +347,30 @@ public class Wallpaper extends WallpaperService {
     				}
     			}
     			mSprites.removeAll(toDeleteList);
+    			mSpriteSize = mSprites.size();
     			// if there's still too many then remove the oldest living
-    			if(mSprites.size() > MAX_SPRITE){
+    			if(mSpriteSize > MAX_SPRITE){
     				if(oldestSprite != null){
     					mSprites.remove(oldestSprite);
+    					mSpriteSize--;
     				}
     			}
     		}
+    		
         }
         
-        //
+        /*
+         * Draws the background to the canvas
+         */
         void drawBG(Canvas c){
 
-        //  if we need a bg image and haven't loaded it, then try to load it
+        /*  if we need a bg image and haven't loaded it, then try to load it
     		if(mShowBgImage  && (mBgImageString != null)){
     			if(mBitmap == null){
     				loadBgBitmap();
     			}
     		}
+    		*/
         	// fade-erase
 			if((mBitmap != null)&&(mShowBgImage)){
 				
@@ -349,7 +383,7 @@ public class Wallpaper extends WallpaperService {
 			}
         }
         /*
-         * Draw a circle around the current touch point, if any.
+         * Draws a circle around the current touch point
          */
         void drawTouchPoint(Canvas c) {
             if (mTouchX >=0 && mTouchY >= 0) {
@@ -362,29 +396,40 @@ public class Wallpaper extends WallpaperService {
             }
         }
         /*
-         * 
+         *  Used to load "wallpapers bitmaps" 
+         *  Note sprite makes its own scaled copy so no need for a scale function here
          */
         void loadSpriteBitmap() {
     		Bitmap bmp = null;
-    		if((mWidth > 0) && (mHeight > 0)){
+    		//load default
+	        bmp=BitmapFactory.decodeResource(getResources(),R.drawable.s04);
 
-    			bmp = Util.imageFilePathToBitmap(getBaseContext(), mSpriteImageString, (int) Math.max(mWidth, mHeight));
-    			if(bmp != null){
-    				mSpriteBitmap = bmp;
-    			}
-
-    		}
+			if(mSpriteImageString!=VOID){
+				bmp = Util.imageFilePathToBitmap(getBaseContext(), mSpriteImageString, (int) MAX_RADIUS);
+			}
+			//Now we should have a valid image but check just in case! :)
+			if(bmp != null){
+				mSpriteBitmap = bmp;
+			}
+    		//clear all known sprites so we make new ones with the new image!!
+    		mSprites.clear();
+            mSpriteSize=0;
     		return;
     	}
        void loadBgBitmap() {
     		Bitmap bmp = null;
+    		bmp=BitmapFactory.decodeResource(getResources(),R.drawable.bg14);
     		if((mWidth > 0) && (mHeight > 0)){
-    			//Resources res=null;
-    			bmp = Util.imageFilePathToBitmap(getBaseContext(), mBgImageString, (int) Math.max(mWidth, mHeight));
-    			//bmp = BitmapFactory.decodeResource(getResources(),R.drawable.bg);
-    			if(bmp != null){
-    				mBitmap = scaleBgBitmap(bmp);
+    			
+    			//load from preference or user choice by string value;
+    			if(mBgImageString!=VOID){
+    				bmp = Util.imageFilePathToBitmap(getBaseContext(), mBgImageString, (int) Math.max(mWidth, mHeight));
     			}
+    			//Now we should have a valid image but check just in case! :)
+    			if(bmp != null){
+    				mBitmap = scaleBgBitmap(bmp);//scale and save to final bitmap
+    			}
+    			//adjust so its centered
     			if(mBitmap != null){
     				mXOffPix = (int) (mXOff * (mWidth - mBitmap.getWidth()));
     				mYOffPix = (int) (mYOff * (mHeight - mBitmap.getHeight()));
@@ -392,7 +437,6 @@ public class Wallpaper extends WallpaperService {
     		}
     		return;
     	}
-       
     private	Bitmap scaleBgBitmap(Bitmap b) {
     		Bitmap result = null;
     		int bw = b.getWidth();
@@ -407,7 +451,7 @@ public class Wallpaper extends WallpaperService {
     		return(result);
     	}
     	/*
-    	 * 
+    	 *  check for any updates in the user settings/prefs
     	 */
     	public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
     		if(key != null){
@@ -417,7 +461,7 @@ public class Wallpaper extends WallpaperService {
     			}else if(key.equals("stockBgImagePref")){
     				changeBgImagePref(prefs.getString("stockBgImagePref", "0"));
     			}else if(key.equals(Settings.BG_IMAGE_KEY)){
-    				changeBgImagePref(prefs.getString(Settings.BG_IMAGE_KEY, null));
+    				changeBgImagePref(prefs.getString(Settings.BG_IMAGE_KEY, VOID));
     			}else if(key.equals("bgColorPref")){
     				changeBgColorPref(prefs.getInt("bgColorPref", mBgColor));
     			}//Sprites
@@ -426,7 +470,7 @@ public class Wallpaper extends WallpaperService {
     			}else if(key.equals("stockSpritePref")){
     				changeSpriteImagePref(prefs.getString("stockSpriteImagePref", "0"));
     			}else if(key.equals(Settings.SPRITE_IMAGE_KEY)){
-    				changeSpriteImagePref(prefs.getString(Settings.SPRITE_IMAGE_KEY, null));
+    				changeSpriteImagePref(prefs.getString(Settings.SPRITE_IMAGE_KEY, VOID));
     			}else if(key.equals("spriteColorPref")){
     				changeBgColorPref(prefs.getInt("spriteColorPref", mSpriteColor));
     			}
@@ -435,7 +479,7 @@ public class Wallpaper extends WallpaperService {
     				changeRotationStylePref(prefs.getString("rotationStylePref", null));
     			}
     			else if(key.equals("collisionPref")){
-    				changeCollisionPref(prefs.getBoolean("collisionPref", true));
+    				changeCollisionPref(prefs.getBoolean("collisionPref", false));
     			}
     			else if(key.equals("physicStylePref")){
     				changePhysicStylePref(prefs.getString("physicStylePref", null));
@@ -446,19 +490,22 @@ public class Wallpaper extends WallpaperService {
     			else if(key.equals("tracerColorPref")){
     				changeTracerColorPref(prefs.getInt("tracerColorPref", mTracerColor));
     			}
+    			else if(key.equals("resetPref")){
+    				changeResetPref();
+    			}
+    			
     			//Stuffs
     			
-    		}else {
+    		}else {//Defaults right lol
     			//Background Images
     			changeShowBgImagePref(prefs.getBoolean("showBgImagePref", true));
-    			changeBgImagePref(prefs.getString(Settings.BG_IMAGE_KEY, null));
+    			changeBgImagePref(prefs.getString(Settings.BG_IMAGE_KEY, VOID));
     			//Use sprites   			
     			changeShowSpritePref(prefs.getBoolean("showSpritesPref", true));
-    			changeSpriteImagePref(prefs.getString(Settings.SPRITE_IMAGE_KEY, null));
+    			changeSpriteImagePref(prefs.getString(Settings.SPRITE_IMAGE_KEY, VOID));
     			//Sprite Stuff
     			changeTracerStylePref(prefs.getString("tracerStylePref", "0"));
-    			changeCollisionPref(prefs.getBoolean("collisionPref", false));
-    			//changePhysicPref(prefs.getBoolean("physicPref", false));
+    			changeCollisionPref(prefs.getBoolean("collisionPref", true));
     			changePhysicStylePref(prefs.getString("physicStylePref", "0"));
     			changeRotationStylePref(prefs.getString("rotationStylePref", "0"));
     			//Color Settings
@@ -517,9 +564,15 @@ public class Wallpaper extends WallpaperService {
     	}
     	private void changeBgImagePref(String value){
     		mBgImageString = value;
-    		if(mShowBgImage){
-    			loadBgBitmap();
-    		}
+    		loadBgBitmap();
+    		return;
+    	}
+    	private void changeResetPref(){
+    		mBgImageString = VOID;
+    		mSpriteImageString = VOID;
+    		loadSpriteBitmap();
+    		loadBgBitmap();
+    		
     		return;
     	}
     }

@@ -8,9 +8,6 @@ import java.util.Set;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.RadialGradient;
-import android.graphics.Shader;
-
 public class Sprite {
 
 	public static final int			NO_COLLISION = 0x00;
@@ -20,7 +17,7 @@ public class Sprite {
 
 	private static int				mColor = 0;
 	private static int				mTracerColor = 0;
-	private static float[]			pos = {0.6f, 1.0f};
+	//private static float[]			pos = {0.6f, 1.0f};
 	private static int[]			colors = {0, 0};
 	
 	private Set<Sprite> 			collisions = new HashSet<Sprite>();
